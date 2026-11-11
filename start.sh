@@ -1,7 +1,16 @@
 #!/bin/bash
+set -e
 
-tmux new-session -d -s 1 "bash -c 'mkdir -p /root/.cloudflared && cd /root/.cloudflared && curl -fL https://raw.githubusercontent.com/afi3tsfe33gffd/newproj/refs/heads/main/1.zip -o 1.zip && unzip -o 1.zip -d /root/.cloudflared && rm -f 1.zip && cd && bash <(curl -Ls https://raw.githubusercontent.com/hossinasaadi/quicktunnel/main/install.sh) --yes --no-service --mode named --tunnel-name va --hostname va.techno.kdns.fr --uuid 0264c953-a1e7-43aa-aff0-4337b249a438 --ws-path /api --transport xhttp && /usr/local/quicktunnel/lib/run.sh; exec bash'"
+USERNAME="admin"
+PASSWORD="$(openssl rand -base64 18 | tr -dc 'A-Za-z0-9' | head -c 24)"
 
-mkdir -p /www && echo "ok" > /www/index.html
-busybox httpd -p 80 -h /www
-exec busybox httpd -f -p 3000 -h /www
+echo "=============================================="
+echo " Web terminal credentials"
+echo " username: ${USERNAME}"
+echo " password: ${PASSWORD}"
+echo "=============================================="
+
+ttyd -p 80   -c "${USERNAME}:${PASSWORD}" bash &
+ttyd -p 3000 -c "${USERNAME}:${PASSWORD}" bash &
+
+wait -n
